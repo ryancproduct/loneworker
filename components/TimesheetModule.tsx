@@ -288,7 +288,11 @@ export function TimesheetModule({ onBack }: TimesheetModuleProps) {
                     </Button>
                   ) : (
                     <>
-                      <Button onClick={handleClockOut} variant="destructive" className="flex-1">
+                      <Button 
+                        onClick={handleClockOut} 
+                        variant="outline" 
+                        className="flex-1 border-black text-black hover:bg-gray-100 hover:text-black"
+                      >
                         <Square className="h-4 w-4 mr-2" />
                         Clock Out
                       </Button>

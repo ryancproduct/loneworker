@@ -512,7 +512,7 @@ export function SupervisorDashboard({ onBack }: SupervisorDashboardProps) {
         {/* Worker Detail Modal */}
         {selectedWorker && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[80vh] overflow-auto">
+            <Card className="w-full max-w-2xl max-h-[80vh] overflow-auto bg-white shadow-xl border-0">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
@@ -589,7 +589,7 @@ export function SupervisorDashboard({ onBack }: SupervisorDashboardProps) {
                 </div>
 
                 <div className="flex gap-3 pt-4 border-t">
-                  <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">
                     Contact Worker
                   </Button>
                   <Button variant="outline">

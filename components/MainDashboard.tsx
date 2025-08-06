@@ -237,7 +237,7 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
           <div className="space-y-2">
             <Button 
               onClick={() => onModuleChange('timesheet')}
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Clock className="h-4 w-4 mr-2" />
               Clock In/Out
