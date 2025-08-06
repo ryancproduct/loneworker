@@ -135,15 +135,14 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
   };
 
   const SafetyCultureLogo = () => (
-    <div className="h-6 w-40 relative">
-      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 164 25">
-        <g>
-          <path d={svgPaths.p11364600} fill="#FFD700" />
-          <path d={svgPaths.pdff4c00} fill="#00D1FF" />
-          <path d={svgPaths.p155a7a00} fill="#6559FF" />
-          <path d={svgPaths.p134a0500} fill="#293745" />
-        </g>
-      </svg>
+    <div className="flex items-center">
+      <div className="bg-blue-600 h-8 w-8 rounded-md flex items-center justify-center mr-2">
+        <Shield className="h-5 w-5 text-white" />
+      </div>
+      <div>
+        <h1 className="font-bold text-blue-700 text-lg tracking-tight">LoneGuard</h1>
+        <p className="text-gray-500 text-xs -mt-1">Safety Management System</p>
+      </div>
     </div>
   );
 
@@ -335,7 +334,7 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
                 <div className="space-y-2">
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 transform -y-1/2 h-4 w-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
                         placeholder="Search"
                         value={searchQuery}
