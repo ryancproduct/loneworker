@@ -493,7 +493,7 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
               
               {/* Side Sheet for Worker Details */}
               {selectedWorkerId && (
-                <div className="absolute top-0 right-0 h-full w-96 bg-white border-l border-gray-200 shadow-lg transform transition-transform duration-300 z-20">
+                <div className="absolute top-0 right-0 h-full w-96 bg-white border-l border-gray-200 shadow-xl transform transition-transform duration-300 z-20 overflow-hidden">
                   <WorkerDetailView 
                     worker={workers.find(w => w.id === selectedWorkerId)!} 
                     onClose={() => setSelectedWorkerId(null)}
@@ -576,7 +576,9 @@ function WorkerDetailView({ worker, onClose }: WorkerDetailViewProps) {
   ];
   
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-white backdrop-blur-none shadow-none">
+      {/* Apply a solid white background */}
+      <div className="absolute inset-0 bg-white -z-10"></div>
       {/* Header with back button */}
       <div className="border-b border-gray-200 p-4 flex items-center">
         <Button variant="ghost" size="sm" onClick={onClose} className="mr-2">
