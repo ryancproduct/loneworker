@@ -93,6 +93,42 @@ const mockWorkers: Worker[] = [
   }
 ];
 
+// Helper function for worker status badges - moved outside component for reuse
+export function getStatusBadge(status: Worker['status']) {
+  switch (status) {
+    case 'active':
+      return (
+        <Badge className="bg-green-100 text-green-800 border-0 font-normal">
+          <div className="h-2 w-2 bg-green-500 rounded-full mr-1"></div>
+          Active
+        </Badge>
+      );
+    case 'panic':
+      return (
+        <Badge className="bg-red-100 text-red-800 border-0 font-normal animate-pulse">
+          <div className="h-2 w-2 bg-red-500 rounded-full mr-1 animate-pulse"></div>
+          Emergency
+        </Badge>
+      );
+    case 'break':
+      return (
+        <Badge className="bg-amber-100 text-amber-800 border-0 font-normal">
+          <div className="h-2 w-2 bg-amber-500 rounded-full mr-1"></div>
+          Break
+        </Badge>
+      );
+    case 'offline':
+      return (
+        <Badge className="bg-gray-100 text-gray-800 border-0 font-normal">
+          <div className="h-2 w-2 bg-gray-400 rounded-full mr-1"></div>
+          Offline
+        </Badge>
+      );
+    default:
+      return null;
+  }
+};
+
 export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDashboardProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [organizeByGroups, setOrganizeByGroups] = useState(false);
@@ -100,6 +136,7 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
   const [selectedTab, setSelectedTab] = useState<'live' | 'jobs-routes' | 'history' | 'settings'>('live');
   const [workers, setWorkers] = useState<Worker[]>(mockWorkers);
   const [emergencyAlerts, setEmergencyAlerts] = useState(2);
+  const [selectedWorkerId, setSelectedWorkerId] = useState<string | null>(null);
 
   const filteredWorkers = workers.filter(worker =>
     worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -399,8 +436,8 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
                 )}
 
                 {filteredWorkers.map((worker) => (
-                  <div key={worker.id} className="border-b border-gray-100">
-                    <Card className="p-4 shadow-none border-0 rounded-none">
+                  <div key={worker.id} className="border-b border-gray-100" onClick={() => setSelectedWorkerId(worker.id)}>
+                    <Card className={`p-4 shadow-none border-0 rounded-none cursor-pointer hover:bg-gray-50 transition-colors ${selectedWorkerId === worker.id ? 'bg-blue-50' : ''}`}>
                       <div className="flex items-start justify-between">
                         <div className="flex gap-3 flex-1">
                           <Avatar className="h-8 w-8">
@@ -453,6 +490,16 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
                 workers={mapWorkers}
                 className="w-full h-full"
               />
+              
+              {/* Side Sheet for Worker Details */}
+              {selectedWorkerId && (
+                <div className="absolute top-0 right-0 h-full w-96 bg-white border-l border-gray-200 shadow-lg transform transition-transform duration-300 z-20">
+                  <WorkerDetailView 
+                    worker={workers.find(w => w.id === selectedWorkerId)!} 
+                    onClose={() => setSelectedWorkerId(null)}
+                  />
+                </div>
+              )}
 
               {/* Emergency Alert Overlay */}
               {panicWorkers.length > 0 && (
@@ -480,6 +527,191 @@ export function MainDashboard({ onModuleChange, userRole, onRoleChange }: MainDa
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+interface WorkerDetailViewProps {
+  worker: Worker;
+  onClose: () => void;
+}
+
+function WorkerDetailView({ worker, onClose }: WorkerDetailViewProps) {
+  // Mock data for the worker details based on the screenshot
+  const workerGroup = worker.jobType === 'Nursing' ? 'Nurses' : 'Field Workers';
+  const bluetoothDevice = worker.hasBluetoothDevice ? 'Flic-AD-123123123' : 'Not assigned';
+  const timeRemaining = '07:05:05';
+  const jobDuration = '02:55:55';
+  const currentLocation = {
+    time: '9:02 am',
+    address: `74 Foveaux St,Surry Hills 2010, NSW, AU`,
+    coordinates: `-33.884524,151.211815`,
+    notes: `Unit 32, level 3. Main entrance under construction—use side door.`
+  };
+  
+  const timeline = [
+    {
+      type: 'Job started',
+      time: '8 Jan 2024, 8:32:05 am',
+      duration: '1 h 00 min',
+      icon: 'check'
+    },
+    {
+      type: 'Checked in',
+      time: '8 Jan 2024, 9:02:05 am',
+      icon: 'check'
+    },
+    {
+      type: 'Job duration extended',
+      time: '8 Jan 2024, 9:16:05 am',
+      additionalTime: '+ 2 h 00 min',
+      icon: 'clock'
+    },
+    {
+      type: 'Checked in',
+      time: '8 Jan 2024, 9:02:05 am',
+      icon: 'check'
+    }
+  ];
+  
+  return (
+    <div className="h-full flex flex-col bg-white">
+      {/* Header with back button */}
+      <div className="border-b border-gray-200 p-4 flex items-center">
+        <Button variant="ghost" size="sm" onClick={onClose} className="mr-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-arrow-left h-5 w-5">
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
+        </Button>
+        <span className="text-base font-medium">Worker Details</span>
+      </div>
+      
+      {/* User details */}
+      <div className="overflow-y-auto flex-1">
+        {/* User header */}
+        <div className="p-4 flex items-center space-x-4">
+          <Avatar className="h-12 w-12">
+            {worker.avatar ? (
+              <AvatarImage src={worker.avatar} alt={worker.name} />
+            ) : (
+              <AvatarFallback>
+                {worker.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div>
+            <div className="flex items-center space-x-2">
+              <div className="text-blue-600 font-medium text-xs uppercase">{worker.jobType}</div>
+              {getStatusBadge(worker.status)}
+            </div>
+            <h2 className="font-semibold text-lg">{worker.name}</h2>
+            <div className="text-sm text-gray-500">ID {worker.jobId}</div>
+          </div>
+        </div>
+        
+        {/* Group */}
+        <div className="px-4 py-2">
+          <div className="text-sm text-gray-600">Group</div>
+          <div className="font-medium">{workerGroup}</div>
+        </div>
+        
+        {/* Bluetooth device */}
+        <div className="px-4 py-2">
+          <div className="text-sm text-gray-600">Bluetooth device</div>
+          <div className="font-medium">{bluetoothDevice}</div>
+        </div>
+        
+        {/* Time information */}
+        <div className="px-4 py-3 flex">
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Time remaining</div>
+            <div className="font-medium">{timeRemaining}</div>
+          </div>
+          <div className="flex-1">
+            <div className="text-sm text-gray-600">Job duration</div>
+            <div className="font-medium">{jobDuration}</div>
+          </div>
+        </div>
+        
+        {/* Current location */}
+        <div className="px-4 py-2">
+          <div className="text-sm text-gray-600">Current location</div>
+          <div className="mt-2 flex items-start">
+            <div className="bg-blue-100 p-2 rounded-full text-blue-700 mr-2">
+              <MapPin className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-blue-600 font-medium">{currentLocation.time}</div>
+              <div className="font-medium">{currentLocation.address}</div>
+              <div className="text-sm text-gray-500">{currentLocation.coordinates}</div>
+              <div className="border-l-2 border-gray-300 pl-3 mt-2 text-sm">
+                {currentLocation.notes}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* View journey button */}
+        <div className="px-4 py-3">
+          <Button variant="outline" className="w-full text-blue-600 border-blue-600" size="sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-route h-4 w-4 mr-2">
+              <circle cx="6" cy="19" r="3" />
+              <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
+              <circle cx="18" cy="5" r="3" />
+            </svg>
+            View journey
+          </Button>
+        </div>
+        
+        {/* Timeline */}
+        <div className="px-4 py-3 border-t border-gray-200">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-medium text-blue-600">Timeline</h3>
+            <div className="flex items-center text-xs">
+              <div className="mr-2">All</div>
+              <div className="w-8 h-4 rounded-full bg-gray-200 relative cursor-pointer">
+                <div className="absolute left-1 top-1 w-2 h-2 rounded-full bg-gray-400"></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Timeline items */}
+          <div className="relative border-l-2 border-gray-300 ml-3">
+            {timeline.map((item, index) => (
+              <div key={index} className="mb-5 ml-6 relative">
+                <div className="absolute -left-8 top-0 bg-green-500 p-1 rounded-full">
+                  {item.icon === 'check' ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check h-4 w-4 text-white">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-clock h-4 w-4 text-white">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                  )}
+                </div>
+                <div className="font-medium">{item.type}</div>
+                <div className="text-sm text-gray-500">{item.time}</div>
+                {item.duration && <div className="text-sm">Duration: {item.duration}</div>}
+                {item.additionalTime && <div className="text-sm">{item.additionalTime}</div>}
+                <div className="absolute right-0 top-0">
+                  <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-crosshair h-4 w-4">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="22" x2="18" y1="12" y2="12" />
+                      <line x1="6" x2="2" y1="12" y2="12" />
+                      <line x1="12" x2="12" y1="6" y2="2" />
+                      <line x1="12" x2="12" y1="22" y2="18" />
+                    </svg>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
