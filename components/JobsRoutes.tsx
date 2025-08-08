@@ -337,6 +337,17 @@ export function JobsRoutes({ onBack }: JobsRoutesProps) {
     setShowCreateRoute(false);
   };
 
+  // Accept a scheduled job: set to in-progress and assign to current user
+  const handleAcceptJob = (jobId: string) => {
+    setJobs(prev =>
+      prev.map(j =>
+        j.id === jobId
+          ? { ...j, status: 'in-progress', assignedWorker: j.assignedWorker || 'Current User' }
+          : j
+      )
+    );
+  };
+
   const todaysJobs = jobs.filter(job => {
     const jobDate = new Date(job.scheduledStart);
     const today = new Date();
@@ -489,6 +500,15 @@ export function JobsRoutes({ onBack }: JobsRoutesProps) {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
+                            <Button
+                              size="sm"
+                              className="text-xs bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() => handleAcceptJob(job.id)}
+                              disabled={job.status !== 'scheduled'}
+                            >
+                              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Accept</span>
+                            </Button>
                             <Button variant="outline" size="sm" className="text-xs">
                               <Edit className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
                               <span className="hidden sm:inline">Edit</span>

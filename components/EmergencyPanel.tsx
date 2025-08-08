@@ -472,20 +472,21 @@ export function EmergencyPanel({ onBack }: EmergencyPanelProps) {
           </Card>
         </div>
 
-        {/* Alert Detail Modal */}
+        {/* Alert Detail Left Overlay Panel */}
         {selectedAlert && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[80vh] overflow-auto bg-white">
+          <div className="fixed inset-y-0 left-0 z-50 w-full max-w-md p-0 sm:p-4">
+            <Card className="h-full sm:h-auto sm:max-h-[90vh] overflow-auto bg-white rounded-none sm:rounded-lg shadow-2xl">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2">
                     {getTypeIcon(selectedAlert.type)}
                     Emergency Alert Details
                   </CardTitle>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     onClick={() => setSelectedAlert(null)}
                     className="h-8 w-8 p-0"
+                    aria-label="Close"
                   >
                     ×
                   </Button>
@@ -554,7 +555,7 @@ export function EmergencyPanel({ onBack }: EmergencyPanelProps) {
 
                 <div className="flex gap-3 pt-4 border-t">
                   {selectedAlert.status === 'active' && (
-                    <Button 
+                    <Button
                       onClick={() => {
                         acknowledgeAlert(selectedAlert.id);
                         setSelectedAlert(null);
@@ -565,7 +566,7 @@ export function EmergencyPanel({ onBack }: EmergencyPanelProps) {
                     </Button>
                   )}
                   {(selectedAlert.status === 'active' || selectedAlert.status === 'acknowledged') && (
-                    <Button 
+                    <Button
                       onClick={() => {
                         resolveAlert(selectedAlert.id);
                         setSelectedAlert(null);
